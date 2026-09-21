@@ -12,7 +12,7 @@ env:
 
 jobs:
   # ──────────────────────────────────────────────
-  # macOS arm64 (M1/M2/M3) — primary build
+  # macOS arm64 (M1/M2/M3)
   # ──────────────────────────────────────────────
   build-macos-arm64:
     name: macOS arm64
@@ -30,20 +30,19 @@ jobs:
       - name: Python setuptools (node-gyp)
         run: python3 -m pip install --break-system-packages setuptools
 
-      - name: Install all dependencies
+      - name: Install root dependencies
         env:
           npm_config_arch: arm64
           GYP_DEFINES: kerberos_use_rtld=false
         run: npm ci
 
-      - name: Install sealpad extension deps
-        working-directory: extensions/sealpad
-        run: npm ci
-
-      - name: Compile sealpad extension
+      - name: Install & compile sealpad extension
         working-directory: extensions/sealpad
         env:
           NODE_ENV: production
+        run: npm ci && npm run compile
+
+      - name: Compile core + all extensions
         run: npm run compile
 
       - name: Package macOS arm64
@@ -51,7 +50,7 @@ jobs:
           npm_config_arch: arm64
           GYP_DEFINES: kerberos_use_rtld=false
           VSCODE_ARCH: arm64
-        run: npx gulp vscode-darwin-arm64 --max-old-space-size=8192
+        run: node_modules/.bin/gulp vscode-darwin-arm64 --max-old-space-size=8192
 
       - name: Create DMG
         run: |
@@ -85,20 +84,19 @@ jobs:
       - name: Python setuptools (node-gyp)
         run: python3 -m pip install --break-system-packages setuptools
 
-      - name: Install all dependencies
+      - name: Install root dependencies
         env:
           npm_config_arch: x64
           GYP_DEFINES: kerberos_use_rtld=false
         run: npm ci
 
-      - name: Install sealpad extension deps
-        working-directory: extensions/sealpad
-        run: npm ci
-
-      - name: Compile sealpad extension
+      - name: Install & compile sealpad extension
         working-directory: extensions/sealpad
         env:
           NODE_ENV: production
+        run: npm ci && npm run compile
+
+      - name: Compile core + all extensions
         run: npm run compile
 
       - name: Package macOS x64
@@ -106,7 +104,7 @@ jobs:
           npm_config_arch: x64
           GYP_DEFINES: kerberos_use_rtld=false
           VSCODE_ARCH: x64
-        run: npx gulp vscode-darwin-x64 --max-old-space-size=8192
+        run: node_modules/.bin/gulp vscode-darwin-x64 --max-old-space-size=8192
 
       - name: Create DMG
         run: |
@@ -143,46 +141,63 @@ jobs:
           sudo apt-get install -y \
             build-essential libx11-dev libxkbfile-dev \
             libsecret-1-dev libkrb5-dev python3-setuptools \
-            fakeroot rpm
+            fakeroot rpm dpkg-dev
 
-      - name: Install all dependencies
+      - name: Install root dependencies
         env:
           npm_config_arch: x64
+          CFLAGS: -Wno-cast-function-type
+          CXXFLAGS: -Wno-cast-function-type
         run: npm ci
 
-      - name: Install sealpad extension deps
-        working-directory: extensions/sealpad
-        run: npm ci
-
-      - name: Compile sealpad extension
+      - name: Install & compile sealpad extension
         working-directory: extensions/sealpad
         env:
           NODE_ENV: production
+        run: npm ci && npm run compile
+
+      - name: Compile core + all extensions
         run: npm run compile
 
-      - name: Package Linux x64
+      - name: Package Linux x64 tarball
+        env:
+          VSCODE_ARCH: x64
+        run: node_modules/.bin/gulp vscode-linux-x64 --max-old-space-size=8192
+
+      - name: Build .deb
         env:
           VSCODE_ARCH: x64
         run: |
-          npx gulp vscode-linux-x64 --max-old-space-size=8192
-          npx gulp vscode-linux-x64-build-deb --max-old-space-size=8192
-          npx gulp vscode-linux-x64-build-rpm --max-old-space-size=8192
+          node_modules/.bin/gulp vscode-linux-x64-prepare-deb --max-old-space-size=8192
+          node_modules/.bin/gulp vscode-linux-x64-build-deb --max-old-space-size=8192
+
+      - name: Build .rpm
+        env:
+          VSCODE_ARCH: x64
+        run: |
+          node_modules/.bin/gulp vscode-linux-x64-prepare-rpm --max-old-space-size=8192
+          node_modules/.bin/gulp vscode-linux-x64-build-rpm --max-old-space-size=8192
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p dist-linux-x64
+          cp .build/linux/deb/amd64/deb/*.deb dist-linux-x64/ 2>/dev/null || true
+          cp .build/linux/rpm/x86_64/*.rpm  dist-linux-x64/ 2>/dev/null || true
+          tar -czf dist-linux-x64/sealpad-linux-x64.tar.gz \
+            -C .build/VSCode-linux-x64 . 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
         with:
           name: sealpad-linux-x64
-          path: |
-            .build/linux/deb/amd64/deb/*.deb
-            .build/linux/rpm/x86_64/*.rpm
-            .build/VSCode-linux-x64/
+          path: dist-linux-x64/
           retention-days: 14
 
   # ──────────────────────────────────────────────
-  # Linux arm64
+  # Linux arm64 (cross-compiled on x64 host)
   # ──────────────────────────────────────────────
   build-linux-arm64:
     name: Linux arm64
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -199,36 +214,50 @@ jobs:
           sudo apt-get install -y \
             build-essential libx11-dev libxkbfile-dev \
             libsecret-1-dev libkrb5-dev python3-setuptools \
-            fakeroot rpm
+            fakeroot dpkg-dev gcc-aarch64-linux-gnu \
+            g++-aarch64-linux-gnu
 
-      - name: Install all dependencies
+      - name: Install root dependencies (arm64 cross)
         env:
           npm_config_arch: arm64
+          CC: aarch64-linux-gnu-gcc
+          CXX: aarch64-linux-gnu-g++
+          CFLAGS: -Wno-cast-function-type
+          CXXFLAGS: -Wno-cast-function-type
         run: npm ci
 
-      - name: Install sealpad extension deps
-        working-directory: extensions/sealpad
-        run: npm ci
-
-      - name: Compile sealpad extension
+      - name: Install & compile sealpad extension
         working-directory: extensions/sealpad
         env:
           NODE_ENV: production
+        run: npm ci && npm run compile
+
+      - name: Compile core + all extensions
         run: npm run compile
 
       - name: Package Linux arm64
         env:
           VSCODE_ARCH: arm64
+        run: node_modules/.bin/gulp vscode-linux-arm64 --max-old-space-size=8192
+
+      - name: Build .deb (arm64)
+        env:
+          VSCODE_ARCH: arm64
         run: |
-          npx gulp vscode-linux-arm64 --max-old-space-size=8192
-          npx gulp vscode-linux-arm64-build-deb --max-old-space-size=8192
+          node_modules/.bin/gulp vscode-linux-arm64-prepare-deb --max-old-space-size=8192
+          node_modules/.bin/gulp vscode-linux-arm64-build-deb --max-old-space-size=8192
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p dist-linux-arm64
+          cp .build/linux/deb/arm64/deb/*.deb dist-linux-arm64/ 2>/dev/null || true
+          tar -czf dist-linux-arm64/sealpad-linux-arm64.tar.gz \
+            -C .build/VSCode-linux-arm64 . 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
         with:
           name: sealpad-linux-arm64
-          path: |
-            .build/linux/deb/arm64/deb/*.deb
-            .build/VSCode-linux-arm64/
+          path: dist-linux-arm64/
           retention-days: 14
 
   # ──────────────────────────────────────────────
@@ -250,28 +279,29 @@ jobs:
       - name: Install Python setuptools
         run: pip install setuptools
 
-      - name: Install all dependencies
+      - name: Install root dependencies
         env:
           npm_config_arch: x64
         run: npm ci
 
-      - name: Install sealpad extension deps
-        working-directory: extensions/sealpad
-        run: npm ci
-
-      - name: Compile sealpad extension
+      - name: Install & compile sealpad extension
         working-directory: extensions/sealpad
         env:
           NODE_ENV: production
+        run: npm ci && npm run compile
+
+      - name: Compile core + all extensions
         run: npm run compile
 
       - name: Package Windows x64
         env:
           VSCODE_ARCH: x64
-        run: npx gulp vscode-win32-x64 --max-old-space-size=8192
+        run: node_modules/.bin/gulp vscode-win32-x64 --max-old-space-size=8192
 
       - name: Zip Windows build
-        run: Compress-Archive -Path ".build/VSCode-win32-x64/*" -DestinationPath "sealpad-win32-x64.zip"
+        run: |
+          Compress-Archive -Path ".build/VSCode-win32-x64/*" `
+            -DestinationPath "sealpad-win32-x64.zip"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -303,7 +333,7 @@ jobs:
         with:
           path: release-assets/
 
-      - name: Get version
+      - name: Get version + tag
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
@@ -328,25 +358,20 @@ jobs:
 
             | Platform | File |
             |---|---|
-            | macOS Apple Silicon | `sealpad-darwin-arm64.dmg` |
+            | macOS Apple Silicon (M1/M2/M3) | `sealpad-darwin-arm64.dmg` |
             | macOS Intel | `sealpad-darwin-x64.dmg` |
-            | Linux x64 (.deb/.rpm) | `sealpad-linux-x64/` |
-            | Linux arm64 (.deb) | `sealpad-linux-arm64/` |
+            | Linux x64 | `sealpad-linux-x64/` (.deb, .rpm, .tar.gz) |
+            | Linux arm64 | `sealpad-linux-arm64/` (.deb, .tar.gz) |
             | Windows x64 | `sealpad-win32-x64.zip` |
 
             > ⚠️ Unsigned builds. macOS: right-click → Open to bypass Gatekeeper on first launch.
 
-            ### Config required
+            ### Config
 
-            Set your Supabase credentials before building locally:
-            ```
-            SEALPAD_SUPABASE_URL=https://slryfimuegrwxpqmkhwz.supabase.co
-            SEALPAD_SUPABASE_ANON_KEY=<your publishable key>
-            ```
+            Set Supabase credentials as `SEALPAD_SUPABASE_URL` and `SEALPAD_SUPABASE_ANON_KEY` in repo secrets before building.
           files: |
             release-assets/sealpad-darwin-arm64/*.dmg
             release-assets/sealpad-darwin-x64/*.dmg
             release-assets/sealpad-win32-x64/*.zip
-            release-assets/sealpad-linux-x64/**/*.deb
-            release-assets/sealpad-linux-x64/**/*.rpm
-            release-assets/sealpad-linux-arm64/**/*.deb
+            release-assets/sealpad-linux-x64/*
+            release-assets/sealpad-linux-arm64/*
