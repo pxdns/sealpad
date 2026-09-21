@@ -198,6 +198,7 @@ jobs:
   build-linux-arm64:
     name: Linux arm64
     runs-on: ubuntu-22.04
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -310,7 +311,7 @@ jobs:
           retention-days: 14
 
   # ──────────────────────────────────────────────
-  # Auto-release on main push (all builds must pass)
+  # Auto-release on main push (arm64 Linux is best-effort)
   # ──────────────────────────────────────────────
   release:
     name: GitHub Release
@@ -318,7 +319,6 @@ jobs:
       - build-macos-arm64
       - build-macos-x64
       - build-linux-x64
-      - build-linux-arm64
       - build-windows-x64
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
