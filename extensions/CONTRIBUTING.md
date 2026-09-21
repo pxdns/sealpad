@@ -1,32 +1,36 @@
-# Contributing to Built-In Extensions
+# Sealpad Extensions
 
-This directory contains built-in extensions that ship with VS Code.
+All Sealpad feature code lives in `extensions/sealpad/`. Other directories in `extensions/` are upstream vscode built-in extensions — do not modify them.
 
-## Basic Structure
+## `extensions/sealpad/` structure
 
-A typical TypeScript-based built-in extension has the following structure:
+```
+extensions/sealpad/
+├── package.json          — extension manifest (commands, views, auth provider)
+├── tsconfig.json         — TypeScript config
+├── esbuild.js            — bundler script (outputs dist/extension.js)
+├── media/
+│   ├── sealpad-logo.svg         — app logo (purple→teal gradient padlock)
+│   └── sealpad-activitybar.svg  — 24px monochrome icon for the Activity Bar
+├── themes/
+│   └── sealpad-tahoe-dark.json  — Tahoe Liquid Glass dark color theme
+└── src/
+    ├── extension.ts       — activate() entry point
+    └── auth/
+        ├── supabaseClient.ts  — Supabase client singleton
+        ├── authProvider.ts    — vscode.AuthenticationProvider implementation
+        └── authWebview.ts     — sign-in / sign-up webview panel
+```
 
-- `package.json`: extension manifest.
-- `src/`: Main directory for TypeScript source code.
-- `tsconfig.json`: primary TypeScript config. This should inherit from `tsconfig.base.json`.
-- `esbuild.mts`: esbuild build script used for production builds.
-- `.vscodeignore`: Ignore file list. You can copy this from an existing extension.
+## Building
 
-TypeScript-based extensions have the following output structure:
+```bash
+cd extensions/sealpad
+npm ci
+npm run compile      # one-shot
+npm run watch        # incremental (also started by root npm run watch)
+```
 
-- `out`: Output directory for development builds
-- `dist`: Output directory for production builds.
+## Adding new upstream extensions
 
-
-## Enabling an Extension in the Browser
-
-By default extensions will only target desktop. To enable an extension in browsers as well:
-
-- Add a `"browser"` entry in `package.json` pointing to the browser bundle (for example `"./dist/browser/extension"`).
-- Add `tsconfig.browser.json` that typechecks only browser-safe sources.
-- Add an `esbuild.browser.mts` file. This should set `platform: 'browser'`.
-
-Make sure the browser build of the extension only uses browser-safe APIs. If an extension needs different behavior between desktop and web, you can create distinct entrypoints for each target:
-
-- `src/extension.ts`: Desktop entrypoint.
-- `src/extension.browser.ts`: Browser entrypoint. Make sure `esbuild.browser.mts` builds this and that `tsconfig.browser.json` targets it.
+If an upstream extension is needed (e.g., for CI or testing), add its directory to `build/npm/dirs.ts`. Do **not** add Sealpad feature code to existing upstream extension directories.
