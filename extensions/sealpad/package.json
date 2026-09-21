@@ -1,0 +1,96 @@
+{
+	"name": "sealpad",
+	"displayName": "Sealpad",
+	"description": "Encrypted messaging and file sharing",
+	"version": "0.1.0",
+	"publisher": "sealpad",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.85.0"
+	},
+	"categories": ["Other"],
+	"activationEvents": ["onStartupFinished"],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "sealpad-sidebar",
+					"title": "Sealpad",
+					"icon": "media/sealpad-activitybar.svg"
+				}
+			]
+		},
+		"views": {
+			"sealpad-sidebar": [
+				{
+					"id": "sealpad.channels",
+					"name": "Channels",
+					"when": "sealpad.authenticated"
+				},
+				{
+					"id": "sealpad.welcome",
+					"name": "Sealpad",
+					"when": "!sealpad.authenticated"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "sealpad.welcome",
+				"contents": "Encrypted chat and file sharing.\n\n[Sign In](command:sealpad.signIn)\n\nDon't have an account? [Create one](command:sealpad.signUp)"
+			}
+		],
+		"commands": [
+			{
+				"command": "sealpad.signIn",
+				"title": "Sign In",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.signOut",
+				"title": "Sign Out",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.openDM",
+				"title": "Open DM",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.createExpiringLink",
+				"title": "Create Expiring Link",
+				"category": "Sealpad"
+			}
+		],
+		"authentication": [
+			{
+				"id": "sealpad",
+				"label": "Sealpad"
+			}
+		],
+		"themes": [
+			{
+				"label": "Sealpad Tahoe Dark",
+				"uiTheme": "vs-dark",
+				"path": "./themes/sealpad-tahoe-dark.json"
+			}
+		]
+	},
+	"scripts": {
+		"compile": "node esbuild.js",
+		"watch": "node esbuild.js --watch"
+	},
+	"dependencies": {
+		"@supabase/supabase-js": "^2.49.0"
+	},
+	"devDependencies": {
+		"esbuild": "^0.25.0",
+		"@types/vscode": "^1.85.0",
+		"@types/node": "^22.x"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/pxdns/sealpad.git"
+	}
+}

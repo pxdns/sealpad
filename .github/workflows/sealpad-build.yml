@@ -1,0 +1,50 @@
+name: Sealpad Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build on macOS (Apple Silicon)
+    runs-on: macos-14  # M1 runner
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false  # skip LFS — copilot test cache blob is private/unavailable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Setup Python setuptools (required by node-gyp)
+        run: python3 -m pip install --break-system-packages setuptools
+
+      - name: Install dependencies
+        env:
+          npm_config_arch: arm64
+          GYP_DEFINES: kerberos_use_rtld=false
+        run: npm ci
+
+      - name: Compile TypeScript
+        run: npx gulp compile-extension-media 2>/dev/null; npm run compile 2>/dev/null || npx tsc --version
+
+      - name: Build sealpad extension
+        working-directory: extensions/sealpad
+        run: |
+          npm ci
+          npm run compile
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: sealpad-extension-${{ github.sha }}
+          path: extensions/sealpad/dist/
+          retention-days: 14

@@ -193,6 +193,12 @@ export function defaultBrowserWindowOptions(accessor: ServicesAccessor, windowSt
 		if (windowSettings?.clickThroughInactive === false) {
 			options.acceptFirstMouse = false;
 		}
+
+		// Liquid Glass effect matching macOS Tahoe vibrancy
+		options.vibrancy = 'under-window';
+		options.visualEffectState = 'active';
+		options.transparent = true;
+		options.backgroundColor = '#00000000';
 	}
 
 	if (overrides?.disableFullscreen) {
