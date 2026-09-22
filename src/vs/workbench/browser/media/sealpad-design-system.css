@@ -1,0 +1,336 @@
+/*
+ * Sealpad Design System
+ * Central source of truth for all design tokens and glass materials.
+ * Imported once via style.ts — affects the entire workbench.
+ */
+
+/* ─── Design Tokens ──────────────────────────────────────────────────────── */
+
+.monaco-workbench {
+
+  /* Glass material values */
+  --sp-blur-secondary: 10px;
+  --sp-blur-float: 18px;
+  --sp-blur-modal: 24px;
+  --sp-saturation: 1.3;
+
+  /* Material opacity levels */
+  --sp-opacity-secondary: 0.82;
+  --sp-opacity-float: 0.90;
+  --sp-opacity-modal: 0.94;
+
+  /* Border system */
+  --sp-border-light: rgba(255, 255, 255, 0.10);
+  --sp-border-medium: rgba(255, 255, 255, 0.14);
+  --sp-border-strong: rgba(255, 255, 255, 0.20);
+  --sp-border-separator: rgba(255, 255, 255, 0.07);
+
+  /* Elevation shadows — additive model */
+  --sp-shadow-1: 0 1px 4px rgba(0, 0, 0, 0.22), 0 0 1px rgba(0, 0, 0, 0.14);
+  --sp-shadow-2: 0 3px 10px rgba(0, 0, 0, 0.26), 0 1px 3px rgba(0, 0, 0, 0.16);
+  --sp-shadow-3: 0 8px 28px rgba(0, 0, 0, 0.30), 0 2px 8px rgba(0, 0, 0, 0.18);
+  --sp-shadow-4: 0 16px 48px rgba(0, 0, 0, 0.36), 0 4px 14px rgba(0, 0, 0, 0.22);
+  --sp-shadow-inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* Spacing scale */
+  --sp-space-1: 2px;
+  --sp-space-2: 4px;
+  --sp-space-3: 6px;
+  --sp-space-4: 8px;
+  --sp-space-5: 12px;
+  --sp-space-6: 16px;
+  --sp-space-7: 20px;
+  --sp-space-8: 24px;
+  --sp-space-10: 32px;
+
+  /* Radius */
+  --sp-radius-sm: 3px;
+  --sp-radius-md: 5px;
+  --sp-radius-lg: 8px;
+  --sp-radius-xl: 12px;
+
+  /* Typography */
+  --sp-font-xs: 10px;
+  --sp-font-sm: 11px;
+  --sp-font-base: 12px;
+  --sp-font-md: 13px;
+  --sp-font-lg: 14px;
+  --sp-font-xl: 16px;
+  --sp-letter-spacing-wide: 0.06em;
+  --sp-letter-spacing-wider: 0.08em;
+
+  /* Motion */
+  --sp-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --sp-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --sp-duration-instant: 60ms;
+  --sp-duration-fast: 100ms;
+  --sp-duration-panel: 160ms;
+  --sp-duration-popup: 130ms;
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .monaco-workbench {
+    --sp-duration-instant: 0ms;
+    --sp-duration-fast: 0ms;
+    --sp-duration-panel: 0ms;
+    --sp-duration-popup: 0ms;
+  }
+}
+
+/* ─── Activity Bar — compact glass rail ─────────────────────────────────── */
+
+.monaco-workbench .part.activitybar {
+  backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  box-shadow: 1px 0 0 var(--sp-border-light), var(--sp-shadow-1);
+}
+
+.monaco-workbench .part.activitybar > .content .action-label {
+  transition: opacity var(--sp-duration-fast) var(--sp-ease-out),
+              color var(--sp-duration-fast) var(--sp-ease-out);
+}
+
+/* ─── Sidebar — secondary glass ─────────────────────────────────────────── */
+
+.monaco-workbench .part.sidebar {
+  backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  box-shadow: 1px 0 0 var(--sp-border-light);
+}
+
+.monaco-workbench .part.auxiliarybar {
+  backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  box-shadow: -1px 0 0 var(--sp-border-light);
+}
+
+/* Section headers — slightly stronger separation */
+.monaco-workbench .part.sidebar .pane-header,
+.monaco-workbench .part.sidebar .title {
+  box-shadow: var(--sp-shadow-inset-top);
+  letter-spacing: var(--sp-letter-spacing-wide);
+}
+
+/* Sidebar title — uppercase, tight tracking */
+.monaco-workbench .part.sidebar > .title > .title-label h2 {
+  font-size: var(--sp-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--sp-letter-spacing-wider);
+  opacity: 0.7;
+}
+
+/* List items — compact, refined hover */
+.monaco-workbench .part.sidebar .monaco-list .monaco-list-row {
+  border-radius: var(--sp-radius-sm);
+  transition: background-color var(--sp-duration-fast) var(--sp-ease-out);
+}
+
+/* ─── Panel (Terminal / Problems / Output) ────────────────────────────────── */
+
+.monaco-workbench .part.panel {
+  backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  box-shadow: 0 -1px 0 var(--sp-border-light), var(--sp-shadow-1);
+}
+
+/* Panel tab bar */
+.monaco-workbench .part.panel .composite.title {
+  box-shadow: var(--sp-shadow-inset-top);
+}
+
+/* ─── Status Bar ─────────────────────────────────────────────────────────── */
+
+.monaco-workbench .part.statusbar {
+  backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  box-shadow: 0 -1px 0 var(--sp-border-separator);
+  font-size: var(--sp-font-base);
+  letter-spacing: 0.01em;
+}
+
+/* ─── Title Bar ──────────────────────────────────────────────────────────── */
+
+.monaco-workbench .part.titlebar {
+  backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  box-shadow: 0 1px 0 var(--sp-border-separator);
+}
+
+/* ─── Editor Tabs ────────────────────────────────────────────────────────── */
+
+/* Tab container */
+.monaco-workbench .part.editor .title.tabs {
+  backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-secondary)) saturate(var(--sp-saturation));
+}
+
+/* Individual tab */
+.monaco-workbench .part.editor > .content .editor-group-container > .title .tab {
+  border-radius: var(--sp-radius-sm) var(--sp-radius-sm) 0 0;
+  transition: background-color var(--sp-duration-fast) var(--sp-ease-out),
+              opacity var(--sp-duration-fast) var(--sp-ease-out);
+  font-size: var(--sp-font-base);
+}
+
+/* Active tab — lift with inset highlight */
+.monaco-workbench .part.editor > .content .editor-group-container > .title .tab.active {
+  box-shadow: var(--sp-shadow-inset-top);
+}
+
+/* ─── Floating Materials — Command Palette, Menus, Suggest ───────────────── */
+
+/* Command palette / Quick Open — strongest glass */
+.monaco-workbench .quick-input-widget {
+  backdrop-filter: blur(var(--sp-blur-modal)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-modal)) saturate(var(--sp-saturation));
+  border-radius: var(--sp-radius-lg);
+  box-shadow: var(--sp-shadow-3), 0 0 0 1px var(--sp-border-medium);
+  overflow: hidden;
+}
+
+/* Context menus */
+.monaco-workbench .monaco-menu .monaco-action-bar.vertical {
+  backdrop-filter: blur(var(--sp-blur-float)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-float)) saturate(var(--sp-saturation));
+  border-radius: var(--sp-radius-md);
+  box-shadow: var(--sp-shadow-2), 0 0 0 1px var(--sp-border-light);
+  overflow: hidden;
+}
+
+/* Suggestion widget */
+.monaco-editor .suggest-widget {
+  backdrop-filter: blur(var(--sp-blur-float)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-float)) saturate(var(--sp-saturation));
+  border-radius: var(--sp-radius-md);
+  box-shadow: var(--sp-shadow-2), 0 0 0 1px var(--sp-border-light);
+  overflow: hidden;
+}
+
+/* Editor hover / parameter hints */
+.monaco-editor .editor-hover,
+.monaco-editor .parameter-hints-widget {
+  backdrop-filter: blur(var(--sp-blur-float)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-float)) saturate(var(--sp-saturation));
+  border-radius: var(--sp-radius-md);
+  box-shadow: var(--sp-shadow-2), 0 0 0 1px var(--sp-border-light);
+  overflow: hidden;
+}
+
+/* Notifications */
+.monaco-workbench .notifications-toasts .notification-toast {
+  backdrop-filter: blur(var(--sp-blur-float)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-float)) saturate(var(--sp-saturation));
+  border-radius: var(--sp-radius-lg);
+  box-shadow: var(--sp-shadow-3), 0 0 0 1px var(--sp-border-light);
+  overflow: hidden;
+}
+
+/* Notification center */
+.monaco-workbench .notifications-center {
+  backdrop-filter: blur(var(--sp-blur-modal)) saturate(var(--sp-saturation));
+  -webkit-backdrop-filter: blur(var(--sp-blur-modal)) saturate(var(--sp-saturation));
+  box-shadow: var(--sp-shadow-3), 0 0 0 1px var(--sp-border-medium);
+  overflow: hidden;
+}
+
+/* Dropdown / select */
+.monaco-workbench .monaco-dropdown .dropdown-label,
+.monaco-workbench select.monaco-select-box {
+  border-radius: var(--sp-radius-sm);
+  transition: background-color var(--sp-duration-fast) var(--sp-ease-out);
+}
+
+/* ─── Input controls ─────────────────────────────────────────────────────── */
+
+.monaco-workbench .monaco-inputbox {
+  border-radius: var(--sp-radius-sm);
+  transition: border-color var(--sp-duration-fast) var(--sp-ease-out);
+}
+
+/* ─── Scrollbars — compact and subtle ───────────────────────────────────── */
+
+.monaco-workbench .monaco-scrollable-element > .scrollbar > .slider {
+  border-radius: 3px;
+}
+
+/* ─── Focus state — consistent Sealpad ring ─────────────────────────────── */
+
+.monaco-workbench .monaco-inputbox:focus-within,
+.monaco-workbench .quick-input-widget .quick-input-filter .monaco-inputbox:focus-within {
+  box-shadow: 0 0 0 1px var(--vscode-focusBorder, rgba(94, 23, 235, 0.6));
+  outline: none;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+
+.monaco-workbench .monaco-button {
+  border-radius: var(--sp-radius-sm);
+  font-size: var(--sp-font-base);
+  font-weight: 500;
+  transition: background-color var(--sp-duration-fast) var(--sp-ease-out),
+              box-shadow var(--sp-duration-fast) var(--sp-ease-out);
+}
+
+.monaco-workbench .monaco-button:not(.secondary):hover {
+  box-shadow: var(--sp-shadow-1);
+}
+
+/* ─── Badges ─────────────────────────────────────────────────────────────── */
+
+.monaco-workbench .monaco-count-badge {
+  border-radius: 10px;
+  font-size: var(--sp-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 1px 5px;
+}
+
+/* ─── Menu bar ───────────────────────────────────────────────────────────── */
+
+.monaco-workbench .menubar .menubar-menu-button {
+  border-radius: var(--sp-radius-sm);
+  font-size: var(--sp-font-base);
+  transition: background-color var(--sp-duration-fast) var(--sp-ease-out);
+}
+
+/* ─── Explorer tree ──────────────────────────────────────────────────────── */
+
+/* Slightly tighter indent guides */
+.monaco-workbench .explorer-viewlet .monaco-list .monaco-list-row .indent-guide {
+  opacity: 0.35;
+}
+
+/* ─── Floating panels mode (stronger glass) ─────────────────────────────── */
+
+.monaco-workbench.floating-panels .part.sidebar,
+.monaco-workbench.floating-panels .part.auxiliarybar {
+  border-radius: var(--sp-radius-lg);
+  box-shadow: var(--sp-shadow-2), 0 0 0 1px var(--sp-border-light);
+  overflow: hidden;
+}
+
+.monaco-workbench.floating-panels .part.panel {
+  border-radius: var(--sp-radius-lg) var(--sp-radius-lg) 0 0;
+  overflow: hidden;
+}
+
+/* ─── Breadcrumbs ────────────────────────────────────────────────────────── */
+
+.monaco-workbench .breadcrumbs-control .monaco-breadcrumbs {
+  font-size: var(--sp-font-sm);
+  opacity: 0.8;
+}
+
+/* ─── Sealpad sidebar (extension webviews) ───────────────────────────────── */
+
+.monaco-workbench .sidebar .composite.viewlet {
+  font-size: var(--sp-font-base);
+}
+
+/* ─── Welcome / Getting Started ──────────────────────────────────────────── */
+
+.monaco-workbench .gettingStartedBody .gettingStarted {
+  font-family: var(--vscode-font-family);
+}

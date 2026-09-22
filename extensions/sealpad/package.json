@@ -1,15 +1,20 @@
 {
 	"name": "sealpad",
 	"displayName": "Sealpad",
-	"description": "Encrypted messaging and file sharing",
-	"version": "0.1.0",
+	"description": "Developer productivity — projects, tasks, bookmarks, workflows, and glass themes",
+	"version": "0.2.0",
 	"publisher": "sealpad",
 	"license": "MIT",
 	"engines": {
 		"vscode": "^1.85.0"
 	},
-	"categories": ["Other"],
-	"activationEvents": ["onStartupFinished"],
+	"categories": [
+		"Other",
+		"Themes"
+	],
+	"activationEvents": [
+		"onStartupFinished"
+	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"viewsContainers": {
@@ -24,26 +29,40 @@
 		"views": {
 			"sealpad-sidebar": [
 				{
-					"id": "sealpad.channels",
-					"name": "Channels",
-					"when": "sealpad.authenticated"
+					"type": "webview",
+					"id": "sealpad.projects",
+					"name": "Projects"
 				},
 				{
-					"id": "sealpad.welcome",
-					"name": "Sealpad",
-					"when": "!sealpad.authenticated"
+					"type": "webview",
+					"id": "sealpad.tasks",
+					"name": "Tasks"
+				},
+				{
+					"id": "sealpad.bookmarks",
+					"name": "Bookmarks"
+				},
+				{
+					"type": "webview",
+					"id": "sealpad.workflows",
+					"name": "Workflows"
 				},
 				{
 					"type": "webview",
 					"id": "sealpad.settings",
 					"name": "Settings"
+				},
+				{
+					"id": "sealpad.welcome",
+					"name": "Sealpad",
+					"when": "!sealpad.authenticated"
 				}
 			]
 		},
 		"viewsWelcome": [
 			{
 				"view": "sealpad.welcome",
-				"contents": "Encrypted chat and file sharing.\n\n[Sign In](command:sealpad.signIn)\n\nDon't have an account? [Create one](command:sealpad.signUp)"
+				"contents": "Sign in to sync your projects and tasks across devices.\n\n[Sign In](command:sealpad.signIn)\n\nNew to Sealpad? [Create an account](command:sealpad.signUp)"
 			}
 		],
 		"commands": [
@@ -58,6 +77,47 @@
 				"category": "Sealpad"
 			},
 			{
+				"command": "sealpad.pinCurrentProject",
+				"title": "Pin Current Project",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.quickCapture",
+				"title": "Quick Capture Task",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.toggleBookmark",
+				"title": "Toggle Bookmark at Cursor",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.gotoBookmark",
+				"title": "Go to Bookmark",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.removeBookmark",
+				"title": "Remove Bookmark",
+				"category": "Sealpad",
+				"icon": "$(trash)"
+			},
+			{
+				"command": "sealpad.startFocus",
+				"title": "Start Focus Session",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.endFocus",
+				"title": "End Focus Session",
+				"category": "Sealpad"
+			},
+			{
+				"command": "sealpad.runWorkflow",
+				"title": "Run Workflow",
+				"category": "Sealpad"
+			},
+			{
 				"command": "sealpad.openDM",
 				"title": "Open DM",
 				"category": "Sealpad"
@@ -68,6 +128,45 @@
 				"category": "Sealpad"
 			}
 		],
+		"keybindings": [
+			{
+				"command": "sealpad.quickCapture",
+				"key": "shift+cmd+space",
+				"mac": "shift+cmd+space",
+				"win": "shift+ctrl+space",
+				"linux": "shift+ctrl+space"
+			},
+			{
+				"command": "sealpad.toggleBookmark",
+				"key": "alt+cmd+k",
+				"mac": "alt+cmd+k",
+				"win": "alt+ctrl+k",
+				"linux": "alt+ctrl+k"
+			},
+			{
+				"command": "sealpad.runWorkflow",
+				"key": "shift+cmd+r",
+				"mac": "shift+cmd+r",
+				"win": "shift+ctrl+r",
+				"linux": "shift+ctrl+r"
+			},
+			{
+				"command": "sealpad.startFocus",
+				"key": "shift+cmd+f",
+				"mac": "shift+cmd+f",
+				"win": "shift+ctrl+f",
+				"linux": "shift+ctrl+f"
+			}
+		],
+		"menus": {
+			"view/item/context": [
+				{
+					"command": "sealpad.removeBookmark",
+					"when": "view == sealpad.bookmarks && viewItem == sealpadBookmark",
+					"group": "inline"
+				}
+			]
+		},
 		"authentication": [
 			{
 				"id": "sealpad",
@@ -79,6 +178,21 @@
 				"label": "Sealpad Tahoe Dark",
 				"uiTheme": "vs-dark",
 				"path": "./themes/sealpad-tahoe-dark.json"
+			},
+			{
+				"label": "Sealpad Slate",
+				"uiTheme": "vs-dark",
+				"path": "./themes/sealpad-slate.json"
+			},
+			{
+				"label": "Sealpad Midnight",
+				"uiTheme": "vs-dark",
+				"path": "./themes/sealpad-midnight.json"
+			},
+			{
+				"label": "Sealpad Paper",
+				"uiTheme": "vs",
+				"path": "./themes/sealpad-paper.json"
 			}
 		]
 	},
@@ -90,9 +204,10 @@
 		"@supabase/supabase-js": "^2.49.0"
 	},
 	"devDependencies": {
-		"esbuild": "^0.25.0",
+		"@types/node": "^22.x",
 		"@types/vscode": "^1.85.0",
-		"@types/node": "^22.x"
+		"esbuild": "^0.25.0",
+		"typescript": "^7.0.2"
 	},
 	"repository": {
 		"type": "git",
