@@ -226,7 +226,14 @@ import './contrib/notebook/browser/notebook.contribution.js';
 // Speech
 import './contrib/speech/browser/speech.contribution.js';
 
-// Chat
+// Chat — service/config layer (needed by workbench core; view panel hidden via settings)
+import './contrib/chat/browser/chat.shared.contribution.js';
+import './contrib/chat/browser/chat.contribution.js';
+import './contrib/chat/browser/agentSessions/agentHost/agentHost.contribution.js';
+import './contrib/chat/browser/chat.view.contribution.js';
+import './contrib/chat/browser/chatSessions/chatSessions.contribution.js';
+import './contrib/chat/browser/contextContrib/chatContext.contribution.js';
+import './contrib/inlineChat/browser/inlineChat.contribution.js';
 
 // Copilot Voice
 import './contrib/agentsVoice/browser/agentsVoice.contribution.js';
@@ -457,6 +464,8 @@ import './contrib/accessibility/browser/accessibility.contribution.js';
 // Metered Connection
 import './contrib/meteredConnection/browser/meteredConnection.contribution.js';
 
+// Share
+import './contrib/share/browser/share.contribution.js';
 
 // Synchronized Scrolling
 import './contrib/scrollLocking/browser/scrollLocking.contribution.js';
