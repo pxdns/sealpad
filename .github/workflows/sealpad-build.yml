@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   SEALPAD_SUPABASE_URL: ${{ secrets.SEALPAD_SUPABASE_URL }}
   SEALPAD_SUPABASE_ANON_KEY: ${{ secrets.SEALPAD_SUPABASE_ANON_KEY }}
@@ -55,7 +59,7 @@ jobs:
       - name: Create DMG
         run: |
           hdiutil create -volname "Sealpad" \
-            -srcfolder ".build/VSCode-darwin-arm64/Sealpad.app" \
+            -srcfolder "../VSCode-darwin-arm64/Sealpad.app" \
             -ov -format UDZO \
             "sealpad-darwin-arm64.dmg"
 
@@ -109,7 +113,7 @@ jobs:
       - name: Create DMG
         run: |
           hdiutil create -volname "Sealpad" \
-            -srcfolder ".build/VSCode-darwin-x64/Sealpad.app" \
+            -srcfolder "../VSCode-darwin-x64/Sealpad.app" \
             -ov -format UDZO \
             "sealpad-darwin-x64.dmg"
 
@@ -147,7 +151,7 @@ jobs:
         env:
           npm_config_arch: x64
           CFLAGS: -Wno-cast-function-type
-          CXXFLAGS: -Wno-cast-function-type
+          CXXFLAGS: -Wno-cast-function-type -std=c++20
         run: npm ci
 
       - name: Install & compile sealpad extension
@@ -184,7 +188,7 @@ jobs:
           cp .build/linux/deb/amd64/deb/*.deb dist-linux-x64/ 2>/dev/null || true
           cp .build/linux/rpm/x86_64/*.rpm  dist-linux-x64/ 2>/dev/null || true
           tar -czf dist-linux-x64/sealpad-linux-x64.tar.gz \
-            -C .build/VSCode-linux-x64 . 2>/dev/null || true
+            -C ../VSCode-linux-x64 . 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
         with:
@@ -224,7 +228,7 @@ jobs:
           CC: aarch64-linux-gnu-gcc
           CXX: aarch64-linux-gnu-g++
           CFLAGS: -Wno-cast-function-type
-          CXXFLAGS: -Wno-cast-function-type
+          CXXFLAGS: -Wno-cast-function-type -std=c++20
         run: npm ci
 
       - name: Install & compile sealpad extension
@@ -253,7 +257,7 @@ jobs:
           mkdir -p dist-linux-arm64
           cp .build/linux/deb/arm64/deb/*.deb dist-linux-arm64/ 2>/dev/null || true
           tar -czf dist-linux-arm64/sealpad-linux-arm64.tar.gz \
-            -C .build/VSCode-linux-arm64 . 2>/dev/null || true
+            -C ../VSCode-linux-arm64 . 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
         with:
@@ -301,7 +305,7 @@ jobs:
 
       - name: Zip Windows build
         run: |
-          Compress-Archive -Path ".build/VSCode-win32-x64/*" `
+          Compress-Archive -Path "..\VSCode-win32-x64\*" `
             -DestinationPath "sealpad-win32-x64.zip"
 
       - uses: actions/upload-artifact@v4
