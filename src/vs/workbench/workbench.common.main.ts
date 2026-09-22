@@ -227,18 +227,11 @@ import './contrib/notebook/browser/notebook.contribution.js';
 import './contrib/speech/browser/speech.contribution.js';
 
 // Chat
-import './contrib/chat/browser/chat.shared.contribution.js';
-import './contrib/chat/browser/chat.contribution.js';
-import './contrib/chat/browser/agentSessions/agentHost/agentHost.contribution.js';
-import './contrib/chat/browser/chat.view.contribution.js';
-import './contrib/inlineChat/browser/inlineChat.contribution.js';
 
 // Copilot Voice
 import './contrib/agentsVoice/browser/agentsVoice.contribution.js';
 import './contrib/mcp/browser/mcp.contribution.js';
 import './contrib/mcp/browser/mcp.view.contribution.js';
-import './contrib/chat/browser/chatSessions/chatSessions.contribution.js';
-import './contrib/chat/browser/contextContrib/chatContext.contribution.js';
 import './contrib/imageCarousel/browser/imageCarousel.contribution.js';
 
 // Interactive
@@ -464,8 +457,6 @@ import './contrib/accessibility/browser/accessibility.contribution.js';
 // Metered Connection
 import './contrib/meteredConnection/browser/meteredConnection.contribution.js';
 
-// Share
-import './contrib/share/browser/share.contribution.js';
 
 // Synchronized Scrolling
 import './contrib/scrollLocking/browser/scrollLocking.contribution.js';

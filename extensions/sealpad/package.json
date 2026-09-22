@@ -32,6 +32,11 @@
 					"id": "sealpad.welcome",
 					"name": "Sealpad",
 					"when": "!sealpad.authenticated"
+				},
+				{
+					"type": "webview",
+					"id": "sealpad.settings",
+					"name": "Settings"
 				}
 			]
 		},

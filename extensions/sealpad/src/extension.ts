@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { SealpadAuthProvider } from './auth/authProvider';
+import { SealpadSettingsViewProvider } from './settingsView';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	const authProvider = new SealpadAuthProvider(context.secrets);
@@ -41,6 +42,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		vscode.commands.registerCommand('sealpad.createExpiringLink', () => {
 			vscode.window.showInformationMessage('Sealpad: Expiring links coming in Phase 4');
 		})
+	);
+
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(
+			SealpadSettingsViewProvider.viewId,
+			new SealpadSettingsViewProvider(context)
+		)
 	);
 
 	// Restore session state on startup
