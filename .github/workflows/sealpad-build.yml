@@ -63,57 +63,6 @@ jobs:
           path: sealpad-darwin-arm64.dmg
           retention-days: 14
 
-  # ── macOS Intel ───────────────────────────────────────────────────────────
-  build-macos-x64:
-    name: macOS x64
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Python setuptools
-        run: python3 -m pip install --break-system-packages setuptools
-
-      - name: Install root deps
-        env:
-          npm_config_arch: x64
-          GYP_DEFINES: kerberos_use_rtld=false
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm ci
-
-      - name: Build sealpad extension
-        working-directory: extensions/sealpad
-        env:
-          NODE_ENV: production
-        run: npm install && npm run compile
-
-      - name: Compile core
-        run: npm run compile
-
-      - name: Package
-        env:
-          npm_config_arch: x64
-          GYP_DEFINES: kerberos_use_rtld=false
-          VSCODE_ARCH: x64
-        run: node_modules/.bin/gulp vscode-darwin-x64 --max-old-space-size=8192
-
-      - name: Create DMG
-        run: |
-          hdiutil create -volname "Sealpad" \
-            -srcfolder "../VSCode-darwin-x64/Sealpad.app" \
-            -ov -format UDZO \
-            sealpad-darwin-x64.dmg
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sealpad-darwin-x64
-          path: sealpad-darwin-x64.dmg
-          retention-days: 14
-
   # ── Linux x64 ────────────────────────────────────────────────────────────
   build-linux-x64:
     name: Linux x64
@@ -212,7 +161,7 @@ jobs:
   # ── Release (main only, all required jobs must pass) ──────────────────────
   release:
     name: Release
-    needs: [build-macos-arm64, build-macos-x64, build-linux-x64, build-windows-x64]
+    needs: [build-macos-arm64, build-linux-x64, build-windows-x64]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
@@ -245,13 +194,11 @@ jobs:
             | Platform | Download |
             |---|---|
             | macOS Apple Silicon | `sealpad-darwin-arm64.dmg` |
-            | macOS Intel | `sealpad-darwin-x64.dmg` |
             | Linux x64 | `sealpad-linux-x64.tar.gz` |
             | Windows x64 | `sealpad-win32-x64.zip` |
 
             > Unsigned builds. macOS: right-click → Open to bypass Gatekeeper.
           files: |
             release-assets/sealpad-darwin-arm64/*.dmg
-            release-assets/sealpad-darwin-x64/*.dmg
             release-assets/sealpad-linux-x64/*.tar.gz
             release-assets/sealpad-win32-x64/*.zip
